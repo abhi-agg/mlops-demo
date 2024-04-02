@@ -20,7 +20,7 @@ You can track the training progress on the Outerbounds UI.
 ## Stand up an example inference server
 
 1. From the e2e directory, run `pip install -r requirements.txt`
-2. Try the inference server locally: `serve run forecast:app_builder flow-name=HelloFlowBQ namespace=<MODEL NAMESPACE>` where
+2. Try the inference server locally: `serve run forecast:app_builder flow-name=TrainingFlowBQ namespace=<MODEL NAMESPACE>` where
 `<MODEL NAMESPACE>` is the namespace used to store the model in Metaflow, e.g. `user:aplacitelli@mozilla.com`.
 
 > [!NOTE]
