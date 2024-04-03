@@ -58,8 +58,7 @@ applications:
   import_path: forecast:app_builder
   args:
     namespace: "user:CHANGEME" # TODO, change this!
-    flow-name: HelloFlowBQ
-    version: 28
+    flow-name: TrainingFlowBQ
   runtime_env:
     pip:
       - outerbounds[gcp]
