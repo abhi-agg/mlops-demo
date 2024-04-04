@@ -18,10 +18,21 @@
 You can track the training progress on the Outerbounds UI.
 
 ## Stand up an example inference server
+This flow enables deploying and running 2 applications locally.
 
 1. From the e2e directory, run `pip install -r requirements.txt`
-2. Try the inference server locally: `serve run forecast:app_builder flow-name=TrainingFlowBQ namespace=<MODEL NAMESPACE>` where
-`<MODEL NAMESPACE>` is the namespace used to store the model in Metaflow, e.g. `user:aplacitelli@mozilla.com`.
+2. Run the applications locally:
+    1. To run the first application (inference by the model trained in ## Train a model step) locally, run
+    ```
+    serve run forecast:app_builder flow-name=TrainingFlowBQ namespace=<MODEL NAMESPACE>
+    ```
+    where `<MODEL NAMESPACE>` is the namespace used to store the model in Metaflow, e.g. `user:aplacitelli@mozilla.com`.
+
+    2. To run the second application (a simple multiplier) locally, run
+    ```
+    serve run multiply:app_builder factor=<VALUE>
+    ```
+    where `<VALUE>` should be set to a float value.
 
 > [!NOTE]
 > The previous steps follow Ray Serve [Local Development with HTTP requests](https://docs.ray.io/en/latest/serve/advanced-guides/dev-workflow.html#local-development-with-http-requests) workflow, allowing fast
@@ -29,10 +40,17 @@ You can track the training progress on the Outerbounds UI.
 > a deployment process similar to the one happening in production, but not strictly
 > required for local development.
 
-3. Autogenerate the config file via: `serve build forecast:app -o serve_config.yaml`. Note that
-we reference `app` and not `app_builder` here because of a bug in the generator. It would complain
-with `TypeError: Expected 'forecast:app_builder' to be an Application but got <class 'function'>.` otherwise.
-4. Tweak the config `serve_config.yaml`, especially the `applications` section. Here's a sample tweaked:
+3. Autogenerate the config file
+
+    To workaround a bug in the generator, please uncomment the last lines referring to `app` in both `forecast.py` and `multiply.py` (we
+    need to reference `app` and not `app_builder` otherwise generator would complain with `TypeError: Expected 'forecast:app_builder' to
+    be an Application but got <class 'function'>.`) and run:
+    ```
+    serve build forecast:app multiply:app -o serve_config.yaml
+    ```
+
+4. Tweak the generated config `serve_config.yaml`, especially the `applications` section. Please set a unique `route_prefix` for each application.
+    Here's a sample tweaked:
 
 ```yaml
 # This file was generated using the `serve build` command on Ray v2.9.3.
@@ -53,8 +71,8 @@ logging_config:
   enable_access_log: true
 
 applications:
-- name: ray-flow1
-  route_prefix: /
+- name: app1
+  route_prefix: /forecast
   import_path: forecast:app_builder
   args:
     namespace: "user:CHANGEME" # TODO, change this!
@@ -65,6 +83,15 @@ applications:
       - scikit-learn==1.3.1
   deployments:
   - name: Forecaster
+
+- name: app2
+  route_prefix: /multiply
+  import_path: multiply:app_builder
+  args:
+    factor: 4
+  runtime_env: {}
+  deployments:
+  - name: Multiplier
 ```
 
 5. (_Optional_) Start a local ray cluster: `ray start --head`.
@@ -72,5 +99,8 @@ applications:
 7. (_Optional_) Check the status via `serve status`.
 
 ## Testing the model
-Try the model: [`curl http://127.0.0.1:8000/?q=1.4`](http://127.0.0.1:8000/?q=1.4).
-You can also visit that URL in your browser. 
+Try the first application: [`curl http://127.0.0.1:8000/forecast?q=1.4`](http://127.0.0.1:8000/forecast?q=1.4)
+
+Try the second application: [`curl http://127.0.0.1:8000/multiply?q=1.8`](http://127.0.0.1:8000/multiply?q=1.8)
+
+You can also visit these URLs in your browser.
