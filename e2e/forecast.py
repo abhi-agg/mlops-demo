@@ -52,7 +52,7 @@ class Forecaster:
 # Straight from this:
 # https://docs.ray.io/en/latest/serve/advanced-guides/app-builder-guide.html#defining-an-application-builder
 def app_builder(args: Dict[str, str]) -> Application:
-    return Forecaster.options(route_prefix="/forecast").bind(args)
+    return Forecaster.bind(args)
 
 # TODO Uncomment the next line if attempting to autogenerte the config.
-app = Forecaster.options(route_prefix="/forecast").bind(args={})
+#app = Forecaster.bind(args={})
