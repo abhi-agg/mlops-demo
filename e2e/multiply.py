@@ -24,8 +24,8 @@ class Multiplier:
 
         return self.multiply(float(params.get("q")))
 
-def app2_builder(args: Dict[str, str]) -> Application:
-    return Multiplier.bind(args)
+def app_builder(args: Dict[str, str]) -> Application:
+    return Multiplier.options(route_prefix="/multiply").bind(args)
 
 # TODO Uncomment the next line if attempting to autogenerate the config.
-#app2 = Multiplier.bind(args={})
+app = Multiplier.options(route_prefix="/multiply").bind(args={})
