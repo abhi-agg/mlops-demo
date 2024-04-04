@@ -55,4 +55,4 @@ def app_builder(args: Dict[str, str]) -> Application:
     return Forecaster.bind(args)
 
 # TODO Uncomment the next line if attempting to autogenerte the config.
-# app = Forecaster.bind(args={})
+#app = Forecaster.bind(args={})
