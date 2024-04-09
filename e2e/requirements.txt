@@ -65,6 +65,7 @@ opentelemetry-semantic-conventions==0.41b0
 opentelemetry-util-http==0.41b0
 outerbounds==0.3.58
 packaging==23.2
+peft @ git+https://github.com/huggingface/peft@a18734d87aa9ae6b94b5bdde192b265bfad7c0b3
 platformdirs==4.2.0
 prometheus_client==0.20.0
 protobuf==4.25.3
@@ -94,6 +95,8 @@ starlette==0.32.0.post1
 threadpoolctl==3.3.0
 tomli==2.0.1
 tomlkit==0.12.4
+torch==2.2.1
+transformers @ git+https://github.com/huggingface/transformers@00c1d87a7d5c8dfb4554370983b5a3f7c069edd7
 typing_extensions==4.10.0
 urllib3==2.0.7
 uvicorn==0.27.1
