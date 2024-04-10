@@ -33,8 +33,8 @@ class MozPilot:
         )
 
         self.model = PeftModel.from_pretrained(model, checkpoint_path, adapter_name="copilot")
-        if not hasattr(self.model, "hf_device_map"):
-            self.model.cuda()
+        #if not hasattr(self.model, "hf_device_map"):
+        #    self.model.cuda()
 
         self.model.add_weighted_adapter(["copilot"], [0.8], "code_buddy")
         self.model.set_adapter("code_buddy")
@@ -47,7 +47,8 @@ class MozPilot:
         with context():
             tokens = self.tokenizer(prompt, return_tensors="pt")
             outputs = self.model.generate(
-                input_ids=tokens.input_ids.cuda(), 
+                #input_ids=tokens.input_ids.cuda(), 
+                input_ids=tokens.input_ids,
                 max_new_tokens=128,
                 temperature=0.2,
                 top_k=50,
@@ -58,7 +59,7 @@ class MozPilot:
             # Filter out the request tokens.
             masked_outputs = outputs[:, tokens.input_ids.shape[1]:]
         return self.tokenizer.batch_decode(masked_outputs, skip_special_tokens=False)[0]
-        
+
     @app.post("/models/generate")
     def generate(self, request: CopilotRequest):
         answer = self.get_code_completion(request.inputs)
