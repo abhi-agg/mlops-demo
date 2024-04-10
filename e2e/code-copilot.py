@@ -23,8 +23,8 @@ class CopilotRequest(BaseModel):
 @serve.ingress(app)
 class MozPilot:
     def __init__(self) -> None:
-        self.tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoderbase-1b")
-        checkpoint_path = "../codellama-hugcoder/checkpoint-500"
+        self.tokenizer = AutoTokenizer.from_pretrained("../../starcoderbase-1b")
+        checkpoint_path = "../../checkpoint-500"
         model = AutoModelForCausalLM.from_pretrained(
             checkpoint_path,
             quantization_config=None, 
