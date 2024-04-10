@@ -23,7 +23,7 @@ class CopilotRequest(BaseModel):
 @serve.ingress(app)
 class MozPilot:
     def __init__(self) -> None:
-        self.tokenizer = AutoTokenizer.from_pretrained("../../starcoderbase-1b")
+        #self.tokenizer = AutoTokenizer.from_pretrained("../../starcoderbase-1b")
         checkpoint_path = "../../checkpoint-500"
         model = AutoModelForCausalLM.from_pretrained(
             checkpoint_path,
@@ -31,13 +31,14 @@ class MozPilot:
             device_map=None,
             torch_dtype=torch.bfloat16,
         )
-
+        '''
         self.model = PeftModel.from_pretrained(model, checkpoint_path, adapter_name="copilot")
         #if not hasattr(self.model, "hf_device_map"):
         #    self.model.cuda()
 
         self.model.add_weighted_adapter(["copilot"], [0.8], "code_buddy")
         self.model.set_adapter("code_buddy")
+        '''
 
     def get_code_completion(self, prompt, disable=False):
         context = contextlib.nullcontext
