@@ -1,8 +1,10 @@
 import contextlib
 import torch
 from fastapi import FastAPI, Request
+from typing import Dict
 from pydantic import BaseModel, Field
 from ray import serve
+from ray.serve import Application
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
@@ -22,7 +24,7 @@ class CopilotRequest(BaseModel):
 @serve.deployment()
 @serve.ingress(app)
 class MozPilot:
-    def __init__(self) -> None:
+    def __init__(self, args: Dict[str, str]) -> None:
         self.tokenizer = AutoTokenizer.from_pretrained("../../starcoderbase-1b")
         checkpoint_path = "../../checkpoint-500"
         model = AutoModelForCausalLM.from_pretrained(
@@ -65,4 +67,8 @@ class MozPilot:
         return {"generated_text": answer, "status": 200}
 
 
-pilot_app = MozPilot.bind()
+def app_builder(args: Dict[str, str]) -> Application:
+    return MozPilot.bind(args)
+
+# TODO Uncomment the next line if attempting to autogenerate the config.
+app = MozPilot.bind(args={})
