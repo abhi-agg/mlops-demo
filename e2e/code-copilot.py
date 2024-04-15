@@ -94,4 +94,4 @@ def app_builder(args: Dict[str, str]) -> Application:
     return MozPilot.bind(args)
 
 # TODO Uncomment the next line if attempting to autogenerate the config.
-app = MozPilot.bind(args={})
+#app = MozPilot.bind(args={})
