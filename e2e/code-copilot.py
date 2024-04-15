@@ -17,8 +17,11 @@ from peft import (
 
 app = FastAPI()
 
+# Path of the local directory where both base models and adapted models are stored
 MODELS_LOCAL_DIRECTORY = "./models"
+# Name of the base model directory
 BASE_MODEL_NAME = "starcoderbase-1b"
+# Name of the adapted model directory
 ADAPTED_MODEL_NAME = "checkpoint-500"
 ADAPTED_MODEL_CONFIG_FILE_NAME = "adapter_config.json"
 ADAPTED_MODEL_CONFIG_KEY_TO_MODIFY = "base_model_name_or_path"
