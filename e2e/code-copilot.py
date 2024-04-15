@@ -31,7 +31,7 @@ class CopilotRequest(BaseModel):
     parameters: dict = Field(description="Additional parameters to use")
 
 
-@serve.deployment()
+@serve.deployment(ray_actor_options={"num_gpus": 1})
 @serve.ingress(app)
 class MozPilot:
     def __init__(self, args: Dict[str, str]) -> None:
