@@ -37,3 +37,11 @@ applications:
   runtime_env: {}
   deployments:
   - name: Multiplier
+
+- name: app3
+  route_prefix: /code-copilot
+  import_path: code-copilot:app_builder
+  args: {}
+  runtime_env: {}
+  deployments:
+  - name: MozPilot
