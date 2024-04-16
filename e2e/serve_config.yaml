@@ -42,6 +42,12 @@ applications:
   route_prefix: /code-copilot
   import_path: code-copilot:app_builder
   args: {}
-  runtime_env: {}
+  runtime_env:
+    pip:
+      - peft @ git+https://github.com/huggingface/peft@a18734d87aa9ae6b94b5bdde192b265bfad7c0b3
+      - transformers @ git+https://github.com/huggingface/transformers@00c1d87a7d5c8dfb4554370983b5a3f7c069edd7
+      - google-cloud-storage
   deployments:
   - name: MozPilot
+    ray_actor_options:
+      num_gpus: 1
