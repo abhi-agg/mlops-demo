@@ -49,7 +49,7 @@ class MozPilot:
         DESTINATION_BASE_MODEL_DIRECTORY_NAME = "starcoderbase-1b"
 
         # Name of the local directory to store the adapted model repository downloaded from GCS
-        DESTINATION_ADAPTED_MODEL_DIRECTORY_NAME = "checkpoint-500"
+        DESTINATION_ADAPTED_MODEL_DIRECTORY_NAME = "checkpoint"
 
         # Name of the config file within the adapted model repository to be updated
         ADAPTED_MODEL_CONFIG_FILE_NAME = "adapter_config.json"
