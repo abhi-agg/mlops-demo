@@ -18,7 +18,7 @@
 You can track the training progress on the Outerbounds UI.
 
 ## Stand up an example inference server
-This flow enables deploying and running 2 applications locally.
+This flow enables deploying and running 3 applications locally.
 
 1. From the e2e directory, run
 
@@ -42,6 +42,12 @@ This flow enables deploying and running 2 applications locally.
 
         where `<VALUE>` should be set to a float value.
 
+    2. To run the third application (a code copilot app) locally (please note that this app requires GPU), run
+
+        ```
+        serve run code-copilot:app_builder
+        ```
+
     > [!NOTE]
     > The previous steps follow Ray Serve [Local Development with HTTP requests](https://docs.ray.io/en/latest/serve/advanced-guides/dev-workflow.html#local-development-with-http-requests) workflow, allowing fast
     > local iteration to prototype the inference server. The next steps are useful to test
@@ -51,10 +57,10 @@ This flow enables deploying and running 2 applications locally.
 3. Autogenerate the config file
 
     To workaround a bug in the generator (where we need to reference `app` and not `app_builder` otherwise generator would complain with `TypeError: Expected 'forecast:app_builder' 
-    to be an Application but got <class 'function'>`), please uncomment the last line in both `forecast.py` and `multiply.py` files where `app` is getting initialized and run:
+    to be an Application but got <class 'function'>`), please uncomment the last line in all three files `forecast.py`, `multiply.py` and `code-copilot.py` files where `app` is getting initialized and run:
 
     ```sh
-    serve build forecast:app multiply:app -o serve_config.yaml
+    serve build forecast:app multiply:app code-copilot:app --o serve_config.yaml
     ```
 
 4. Tweak the generated config `serve_config.yaml`, especially the `applications` section. Please set a unique `route_prefix` for each application.
@@ -100,11 +106,27 @@ This flow enables deploying and running 2 applications locally.
       runtime_env: {}
       deployments:
       - name: Multiplier
+
+    - name: app3
+      route_prefix: /code-copilot
+      import_path: code-copilot:app_builder
+      args: {}
+      runtime_env:
+        pip:
+          - peft @ git+https://github.com/huggingface/peft@a18734d87aa9ae6b94b5bdde192b265bfad7c0b3
+          - transformers @ git+https://github.com/huggingface/transformers@00c1d87a7d5c8dfb4554370983b5a3f7c069edd7
+          - google-cloud-storage
+          - torch==2.0.1
+      deployments:
+      - name: MozPilot
+        ray_actor_options:
+          num_gpus: 1
     ```
 
-5. (_Optional_) Start a local ray cluster: `ray start --head`.
+5. Start a local ray cluster: `ray start --head`.
 6. Deploy the server: `serve deploy serve_config.yaml`.
 7. (_Optional_) Check the status via `serve status`.
+8. Stop the local ray cluster once you are done testing the models: `ray stop`
 
 ## Testing the model
 Try the first application: [`curl http://127.0.0.1:8000/forecast?q=1.4`](http://127.0.0.1:8000/forecast?q=1.4)
@@ -112,3 +134,5 @@ Try the first application: [`curl http://127.0.0.1:8000/forecast?q=1.4`](http://
 Try the second application: [`curl http://127.0.0.1:8000/multiply?q=1.8`](http://127.0.0.1:8000/multiply?q=1.8)
 
 You can also visit these URLs in your browser.
+
+Try the third application: `curl -d '{"inputs":"Glean.initialize("}' -X POST "http://127.0.0.1:8000/code-copilot/models/generate" -H "Content-Type: application/json"`
