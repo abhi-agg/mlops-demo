@@ -2,6 +2,7 @@ import os
 import io
 import logging
 import sys
+from datetime import datetime
 
 from pathlib import Path
 
@@ -68,20 +69,27 @@ class ArtifactStore:
         client = storage.Client(project=self.gcs_project_name)
         bucket = client.get_bucket(self.gcs_bucket_name)
 
-        blob_names_in_remote_directory = client.list_blobs(self.gcs_bucket_name, prefix=remote_directory, delimiter=None)
-        blob_file_pairs = [(blob, local_directory + blob.name.removeprefix(remote_directory)) for blob in blob_names_in_remote_directory]
+        blobs_in_remote_directory = client.list_blobs(self.gcs_bucket_name, prefix=remote_directory, delimiter=None)
+        blob_file_pairs = [(blob, os.path.join(local_directory, Path(blob.name).relative_to(remote_directory))) for blob in blobs_in_remote_directory if blob.size != 0 ]
 
         # Create any directory that's needed.
         p = Path(local_directory)
         p.mkdir(parents=True, exist_ok=True)
 
-        results = transfer_manager.download_many(blob_file_pairs, skip_if_exists=False)
+        # start downloading
+        for blob_file_pair in blob_file_pairs:
+            logger.info(f"Downloading blob:'{blob_file_pair[0].name}' to location:'{blob_file_pair[1]}'")
+        start = datetime.now()
+        results = transfer_manager.download_many(blob_file_pairs, skip_if_exists=False, max_workers=16)
+        end = datetime.now()
+        logger.info(f"Time elapsed for downloading: {(end - start).total_seconds()}")
         for blob_file_pair, result in zip(blob_file_pairs, results):
             # The results list is either `None` or an exception for each blob in the input list, in order.
             if isinstance(result, Exception):
-                raise Exception(f"Failed to download blob: '{blob_file_pair[0].name}' to location: '{blob_file_pair[1]}' due to exception: '{result}'")
+                exception_msg = f"Failed to download blob:'{blob_file_pair[0].name}' to location:'{blob_file_pair[1]}' due to exception: '{result}'"
+                raise Exception(exception_msg)
             else:
-                logger.info(f"Downloaded blob: '{blob_file_pair[0].name}' to location: '{blob_file_pair[1]}'")
+                logger.info(f"Downloaded blob:'{blob_file_pair[0].name}' to location:'{blob_file_pair[1]}'")
 
     def store_flow_data(self, data: bytes, filename: str) -> str:
         from metaflow import current
@@ -117,4 +125,6 @@ class ArtifactStore:
 if __name__ == '__main__':
     artifact_store: ArtifactStore = ArtifactStore("moz-fx-mlops-inference-nonprod", "mf-models-test1")
     #artifact_store.fetch_all_flow_data_from_directory("CodeAutocompletionFlow", "107", "trained/checkpoint-2", "./models/checkpoint-500")
-    artifact_store.fetch_directory("TrainingFlowBQ/37", "./test-model/checkpoint")
+    #artifact_store.fetch_directory("copilot-demo/starcoderbase-1b", "./test-model/starcoderbase-1b")
+    #artifact_store.fetch_directory("copilot-demo/", "./test-model/starcoderbase-1b")
+    #artifact_store.fetch_directory("CodeAutocompletionFlow/argo-codeautocompletionflow-wp5kr/trained/checkpoint-1000", "./test-model/checkpoint")
