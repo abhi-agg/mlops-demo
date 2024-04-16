@@ -23,7 +23,7 @@ This flow enables deploying and running 2 applications locally.
 1. From the e2e directory, run
 
     ```sh
-    pip install -r requirements.txt
+    pip install -r requirements-ray.txt
     ```
 2. Run the applications locally:
     1. To run the first application (inference by the model trained in ## Train a model step) locally, run
