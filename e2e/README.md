@@ -135,4 +135,4 @@ Try the second application: [`curl http://127.0.0.1:8000/multiply?q=1.8`](http:/
 
 You can also visit these URLs in your browser.
 
-Try the third application: `curl -d '{"inputs":"Glean.initialize("}' -X POST "http://127.0.0.1:8000/code-copilot/models/generate" -H "Content-Type: application/json"`
+Try the third application: `curl -i -d '{"inputs":"Glean.initialize(", "parameters": {"max_new_tokens": 64}}' -X POST "http://127.0.0.1:8000/code-copilot/models/generate" -H "Content-Type: application/json"`
